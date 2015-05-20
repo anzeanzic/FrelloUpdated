@@ -1,1 +1,0 @@
-﻿Borrar las carpetas C:\AMD y/o C:\NVIDIA

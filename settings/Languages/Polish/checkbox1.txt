@@ -1,1 +1,0 @@
-﻿Usuń foldery C:\AMD lub/i C:\NVIDIA

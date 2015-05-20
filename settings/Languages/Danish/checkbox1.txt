@@ -1,1 +1,0 @@
-﻿Fjern mapperne C:\AMD og/eller C:\NVIDIA
