@@ -1,0 +1,81 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+		<script type="text/javascript" src="Frello.js"></script>
+		<style>
+			.row { margin: 10px 0 10px 0; }
+			.header { margin-bottom: 20px; }
+			#notification { position: absolute; right: 10px; top: 10px; width: 200px; height: 70px; font-size: 14px; border-radius: 10px; border: 1px solid #2e6da4; }
+			.added { color: green; }
+			.removed { color: red; }
+		</style>
+	</head>
+	<body ng-app="frello">
+		<div ng-controller="FrelloController" class="container">
+			<h1>Frello</h1>
+			<div class="header">
+				<label>Task:</label>
+				<input type="text" ng-model="task" />
+				<input type="checkbox" ng-model="completed" />  <label for="completed">Completed</label>
+				<button ng-click="frello.addTask(task, completed)" class="btn btn-primary">Dodaj task</button>
+				<button ng-show="frello.todoListVisible" ng-click="frello.toogleTaskList()" class="btn btn-primary">Skrij task listo</button>
+				<button ng-hide="frello.todoListVisible" ng-click="frello.toogleTaskList()" class="btn btn-primary">Prikaži task listo</button>
+			</div>
+			<div ng-show="frello.todoListVisible">
+				<div class="well">
+					<h3>Completed</h3>
+					<div ng-repeat="item in frello.tasks | filter:{isCompleted:true}">
+						<div class="row">
+							<div class="col-md-4">
+								{{ item.name }}
+							</div>
+							<div class="col-md-4">
+								<input type="checkbox" ng-model="taskUncompleted" ng-change="frello.changeTaskState(item)" />  <label for="taskCompleted">Uncompleted</label>
+							</div>
+							<div class="col-md-4">
+								<button ng-click="frello.removeTask(item)" class="btn btn-primary">Izbrisi task</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="well">
+					<h3>Uncompleted</h3>
+					<div ng-repeat="item in frello.tasks | filter:{isCompleted:false}">
+						<div class="row">
+							<div class="col-md-4">
+								{{ item.name }}
+							</div>
+							<div class="col-md-4">
+								<input type="checkbox" ng-model="taskCompleted" ng-change="frello.changeTaskState(item)" />  <label for="taskCompleted">Completed</label>
+							</div>
+							<div class="col-md-4">
+								<button ng-click="frello.removeTask(item)" class="btn btn-primary">Izbrisi task</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="notification" class="well {{ frello.notification_class }}" ng-show="frello.showNotification">
+				{{ status }}
+			</div>
+		</div>
+		<hr />
+		<div ng-controller="FrelloController2" class="container">
+			<h1>Frello 2</h1>
+			<div class="header">
+				<label>Task:</label>
+				<input type="text" ng-model="task" />
+				<input type="checkbox" ng-model="completed" />  <label for="completed">Completed</label>
+				<button ng-click="frello.addTask(task, completed)" class="btn btn-primary">Dodaj task</button>
+				<button ng-show="frello.todoListVisible" ng-click="frello.toogleTaskList()" class="btn btn-primary">Skrij task listo</button>
+				<button ng-hide="frello.todoListVisible" ng-click="frello.toogleTaskList()" class="btn btn-primary">Prikaži task listo</button>
+			</div>
+		</div>
+	</body>
+</html>
