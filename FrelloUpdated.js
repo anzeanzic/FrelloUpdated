@@ -5,10 +5,23 @@ TODO: Dodaj se EDIT task
 
 Naj bo fizzbuzz vezan na promise. 
 */
-angular.module('frello', []);
+angular.module('frello', ['ui.bootstrap']);
 
-angular.module('frello').controller('FrelloController', function($scope, FrelloFactory) {
+angular.module('frello').controller('FrelloController', function($scope, $modal, FrelloFactory) {
 	$scope.frello = FrelloFactory;
+
+	$scope.open = function(task) { 
+		var modalInstance = $modal.open({
+			animation: true,
+			templateUrl: 'modal.html',
+			controller: 'ModalController',
+			resolve: {
+				clickedTask: function() {
+					return task;
+				}
+			}
+    	});
+	}
 
 	// listener
 	$scope.$on('frello.notification', function(event, data){
@@ -16,13 +29,25 @@ angular.module('frello').controller('FrelloController', function($scope, FrelloF
     });
 });
 
-angular.module('frello').controller('FrelloController2', function($scope, FrelloFactory) {
+angular.module('frello').controller('ModalController', function($scope, $modalInstance, FrelloFactory, clickedTask) {
 	$scope.frello = FrelloFactory;
+	$scope.editedTask = clickedTask.name;
+	$scope.TaskNameChanged = true;
 
-	// listener
-	$scope.$on('frello.notification', function(event, data){
-        $scope.status = data;
-    });
+	$scope.Confirm = function () {
+		var TaskNameChanged = $scope.frello.editTask(clickedTask, $scope.editedTask);
+		if (TaskNameChanged) {
+			$scope.TaskNameChanged = true;
+			$modalInstance.close('');
+		}
+		else {
+			$scope.TaskNameChanged = false;
+		}
+	};
+
+	$scope.Cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
 });
 
 angular.module('frello').factory('FrelloFactory', function($rootScope, $timeout) {
@@ -46,6 +71,22 @@ angular.module('frello').factory('FrelloFactory', function($rootScope, $timeout)
 					_this.showNotification = false;
 				}, 3000);
 			}
+		},
+		editTask: function(task, new_task_name) {
+			var task_index = this.tasks.indexOf(task);
+			if (new_task_name != undefined && !CheckIfTaskAlreadyExists(new_task_name, this.tasks)) {
+				var old_task_name = this.tasks[task_index].name;
+				this.tasks[task_index].name = new_task_name;
+				this.notification_class = 'edited';
+				$rootScope.$broadcast('frello.notification', 'Task "'+old_task_name+'" uspešno preimenovan v "'+new_task_name+'"!');
+				this.showNotification = true;
+				var _this = this;
+				$timeout(function() {
+					_this.showNotification = false;
+				}, 3000);
+				return true;
+			}
+			return false;
 		},
 		removeTask: function(task) {
 			var task_index = this.tasks.indexOf(task);
@@ -73,11 +114,11 @@ angular.module('frello').factory('FrelloFactory', function($rootScope, $timeout)
 	};
 });
 
-var CheckIfTaskAlreadyExists = function(task, tasksArray) {
+var CheckIfTaskAlreadyExists = function(task_name, tasksArray) {
 	var alreadyExists = false;
 	if (tasksArray.length > 0) {
 		for (var i = 0; i < tasksArray.length; i++) {
-			if (task === tasksArray[i].name) {
+			if (task_name === tasksArray[i].name) {
 				alreadyExists = true;
 				break;
 			}
