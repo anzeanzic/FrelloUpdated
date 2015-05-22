@@ -15,7 +15,7 @@
 			.row > div { vertical-align: middle; }
 			.header { margin-bottom: 20px; }
 			.form-control { width: 300px; display: inline-block; margin-right: 10px; }
-			#notification { position: absolute; right: 30px; top: 30px; width: 200px; height: 70px; font-size: 14px; border-radius: 10px; border: 1px solid #2e6da4; }
+			#notification { position: absolute; right: 30px; top: 30px; width: 220px; height: 70px; font-size: 14px; border-radius: 10px; border: 1px solid #2e6da4; }
 			.added { color: green; }
 			.removed { color: red; }
 			.edited { color: orange; }
@@ -29,9 +29,10 @@
 				<label>Task:</label>
 				<input type="text" ng-model="task" class="form-control" />
 				<input type="checkbox" ng-model="completed" />  <label for="completed">Completed</label>
-				<button ng-click="frello.addTask(task, completed)" class="btn btn-primary">Dodaj task</button>
-				<button ng-show="frello.todoListVisible" ng-click="frello.toogleTaskList()" class="btn btn-primary">Skrij task listo</button>
-				<button ng-hide="frello.todoListVisible" ng-click="frello.toogleTaskList()" class="btn btn-primary">Prikaži task listo</button>
+				<button ng-click="frello.addTask(task, completed)" class="btn btn-primary">Add task</button>
+				<button ng-show="frello.todoListVisible" ng-click="frello.toogleTaskList()" class="btn btn-primary">Hide task list</button>
+				<button ng-hide="frello.todoListVisible" ng-click="frello.toogleTaskList()" class="btn btn-primary">Show task list</button>
+				<p>{{ error_status }}</p>
 			</div>
 			<div ng-show="frello.todoListVisible">
 				<div class="well">
@@ -74,16 +75,16 @@
 			</div>
 		    <script type="text/ng-template" id="modal.html">
 		        <div class="modal-header">
-		            <h3 class="modal-title">Urejanje taska</h3>
+		            <h3 class="modal-title">Editing task</h3>
 		        </div>
 		        <div class="modal-body">
-		        	<p class="error-notification bg-danger" ng-hide="TaskNameChanged">Task s tem imenom že obstaja!</p>
+		        	<p class="error-notification bg-danger" ng-hide="TaskNameChanged">Task is empty or it already exists!</p>
 		        	<label>Task:</label>
 					<input class="form-control" type="text" ng-model="editedTask" />
 		        </div>
 		        <div class="modal-footer">
-		            <button class="btn btn-primary" ng-click="Confirm()">Potrdi</button>
-		            <button class="btn btn-default" ng-click="Cancel()">Prekliči</button>
+		            <button class="btn btn-primary" ng-click="Confirm()">Confirm</button>
+		            <button class="btn btn-default" ng-click="Cancel()">Cancel</button>
 		        </div>
 		    </script>
 		</div>

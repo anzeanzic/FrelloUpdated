@@ -1,15 +1,9 @@
-
-/*
-V desnem zgornjem kotu obvestilo z zeleno da se je dodal, z rdeco odstranil, z rumeno pa change. po 3 sekundah izgine.
-TODO: Dodaj se EDIT task
-
-Naj bo fizzbuzz vezan na promise. 
-*/
 angular.module('frello', ['ui.bootstrap']);
 
 angular.module('frello').controller('FrelloController', function($scope, $modal, FrelloFactory) {
 	$scope.frello = FrelloFactory;
 
+	// modal
 	$scope.open = function(task) { 
 		var modalInstance = $modal.open({
 			animation: true,
@@ -56,34 +50,24 @@ angular.module('frello').factory('FrelloFactory', function($rootScope, $timeout)
 		todoListVisible: true,
 		showNotification: false,
 		notification_class: '',
+		closeNotificationTimeout: null,
 		addTask: function(task, isCompleted) {
 			if (isCompleted === undefined) {
 				isCompleted = false;
 			}
-			// check if task is not empty
-			if (task != undefined && !CheckIfTaskAlreadyExists(task, this.tasks)) {
+
+			if (this.validateTask(task)) {
 				this.tasks.push({ name: task, isCompleted: isCompleted });
-				$rootScope.$broadcast('frello.notification', 'Task "'+task+'" uspešno dodan!');
-				this.notification_class = 'added';
-				this.showNotification = true;
-				var _this = this;
-				$timeout(function() {
-					_this.showNotification = false;
-				}, 3000);
+				this.createBroadcast('Task "'+task+'" successfully added!', 'added');
 			}
 		},
 		editTask: function(task, new_task_name) {
 			var task_index = this.tasks.indexOf(task);
-			if (new_task_name != undefined && !CheckIfTaskAlreadyExists(new_task_name, this.tasks)) {
+
+			if (this.validateTask(new_task_name)) {
 				var old_task_name = this.tasks[task_index].name;
 				this.tasks[task_index].name = new_task_name;
-				this.notification_class = 'edited';
-				$rootScope.$broadcast('frello.notification', 'Task "'+old_task_name+'" uspešno preimenovan v "'+new_task_name+'"!');
-				this.showNotification = true;
-				var _this = this;
-				$timeout(function() {
-					_this.showNotification = false;
-				}, 3000);
+				this.createBroadcast('Task "'+old_task_name+'" successfully renamed to "'+new_task_name+'"!', 'edited');
 				return true;
 			}
 			return false;
@@ -93,20 +77,48 @@ angular.module('frello').factory('FrelloFactory', function($rootScope, $timeout)
 			if (task_index > -1) {
 				var task_name = this.tasks[task_index];
 				this.tasks.splice(task_index, 1);
-				this.notification_class = 'removed';
-				$rootScope.$broadcast('frello.notification', 'Task "'+task_name.name+'" uspešno odstranjen!');
-				this.showNotification = true;
-				var _this = this;
-				$timeout(function() {
-					_this.showNotification = false;
-				}, 3000);
+				this.createBroadcast('Task "'+task_name.name+'" successfully removed!', 'removed');
 			}
+		},
+		createBroadcast: function(text, css_style) {
+			// close notification if it is shown
+			this.showNotification = false;
+			$timeout.cancel(this.closeNotificationTimeout);
+
+			// create a new broadcast (and notification)
+			$rootScope.$broadcast('frello.notification', text);
+			this.notification_class = css_style;
+			this.showNotification = true;
+			var _this = this;
+			this.closeNotificationTimeout = $timeout(function() {
+				_this.showNotification = false;
+			}, 3000);
+		},
+		validateTask: function(task) {
+			var taskOk = true;
+			var error_text = "";
+
+			if (task === undefined || task.trim().length === 0) {
+				taskOk = false;
+				error_text = 'Task must contain at least one alphanumeric sign!';
+			}
+			else if (CheckIfTaskAlreadyExists(task, this.tasks)) {
+				taskOk = false;
+				error_text = 'Task "'+task+'" already exists on the task list!';
+			}
+
+			if (!taskOk) {
+				this.createBroadcast(error_text, 'text-danger');
+			}
+
+			return taskOk;
 		},
 		toogleTaskList: function() {
 			this.todoListVisible = this.todoListVisible ? false : true;
 		},
 		changeTaskState: function(task) {
 			task.isCompleted = task.isCompleted ? false : true;
+			this.createBroadcast('Task "'+task.name+'" successfully changed it state '+(task.isCompleted ? 'completed' : 'uncompleted')+'!', 'edited');
 		},
 		changeNotificationState: function(state) {
 			this.showNotification = state;
