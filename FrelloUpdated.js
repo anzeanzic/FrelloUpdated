@@ -118,7 +118,7 @@ angular.module('frello').factory('FrelloFactory', function($rootScope, $timeout)
 		},
 		changeTaskState: function(task) {
 			task.isCompleted = task.isCompleted ? false : true;
-			this.createBroadcast('Task "'+task.name+'" successfully changed it state '+(task.isCompleted ? 'completed' : 'uncompleted')+'!', 'edited');
+			this.createBroadcast('Task "'+task.name+'" successfully changed it state to '+(task.isCompleted ? 'completed' : 'uncompleted')+'!', 'edited');
 		},
 		changeNotificationState: function(state) {
 			this.showNotification = state;
